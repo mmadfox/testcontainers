@@ -3,6 +3,8 @@ package mongo
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/docker/go-connections/nat"
@@ -15,6 +17,7 @@ import (
 type Options struct {
 	tc.ContainerOptions
 	User     string
+	Port     int
 	Password string
 	ImageTag string
 }
@@ -52,7 +55,11 @@ func Start(ctx context.Context, options Options) (Container, error) {
 	container.User = options.User
 	container.Password = options.Password
 
-	port, err := nat.NewPort("", "27017")
+	if options.Port <= 0 {
+		options.Port = 27017
+	}
+
+	port, err := nat.NewPort("", strconv.Itoa(options.Port))
 	if err != nil {
 		return container, fmt.Errorf("failed to build port: %v", err)
 	}
@@ -68,16 +75,22 @@ func Start(ctx context.Context, options Options) (Container, error) {
 		timeout = 5 * time.Minute // Default timeout
 	}
 
+	rawPort := strings.Trim(string(port), "/")
+
 	tag := "latest"
 	if options.ImageTag != "" {
 		tag = options.ImageTag
 	}
 
+	exposedPorts := []string{
+		fmt.Sprintf("%s:%s", rawPort, "27017"),
+	}
+
 	req := testcontainers.ContainerRequest{
 		Image:        fmt.Sprintf("mongo:%s", tag),
 		Env:          env,
-		ExposedPorts: []string{string(port)},
-		WaitingFor:   wait.ForListeningPort(port).WithStartupTimeout(timeout),
+		ExposedPorts: exposedPorts,
+		WaitingFor:   wait.ForListeningPort("27017").WithStartupTimeout(timeout),
 	}
 
 	tc.MergeRequest(&req, &options.ContainerOptions.ContainerRequest)
@@ -97,7 +110,7 @@ func Start(ctx context.Context, options Options) (Container, error) {
 	}
 	container.Host = host
 
-	realPort, err := mongoContainer.MappedPort(ctx, port)
+	realPort, err := mongoContainer.MappedPort(ctx, "27017")
 	if err != nil {
 		return container, fmt.Errorf("failed to get exposed container port: %v", err)
 	}
