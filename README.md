@@ -18,6 +18,48 @@ Available containers (feel free to contribute):
 
 #### HighLevel API
 
+##### Sets
+```go
+package main
+
+import (
+	"context"
+	"log"
+
+	"github.com/romnn/testcontainers"
+
+	"github.com/romnn/testcontainers/infra"
+)
+
+func main() {
+	myInfra := infra.NewSets()
+	defer myInfra.Close()
+
+	// reset containers if needed
+	testcontainers.DropNetwork(myInfra.ContainerNames.Network)
+	testcontainers.DropContainerIfExists(myInfra.ContainerNames.Redis)
+	testcontainers.DropContainerIfExists(myInfra.ContainerNames.Mongo)
+	testcontainers.DropContainerIfExists(myInfra.ContainerNames.Kafka)
+	testcontainers.DropContainerIfExists(myInfra.ContainerNames.Zookeeper)
+
+	ctx := context.Background()
+	myInfra.SetupBridgeNetwork(ctx)
+	myInfra.SetupRedis(ctx)
+	myInfra.SetupMongo(ctx)
+	myInfra.SetupKafka(ctx)
+
+	if myInfra.Err() != nil {
+		log.Fatal(myInfra.Err())
+	}
+
+	// your testing logic ...
+
+	// myInfra.RedisClient() => storage, repository, etc
+	// myInfra.MongoDB()     => storage, repository, etc
+	// myInfra.KafkaAddr()   => producing, consuming, etc
+}
+```
+
 ##### Redis container
 ```go
 package main
@@ -25,6 +67,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/romnn/testcontainers"
 	tcinfra "github.com/romnn/testcontainers/infra"
 	"log"
 )
@@ -34,7 +77,7 @@ func main() {
 	redisContainerName := "redis-01-test"
 	redisContainerPort := 6718
 
-	tcinfra.DropContainerIfExists(redisContainerName)
+	testcontainers.DropContainerIfExists(redisContainerName)
 
 	db, terminate, err := tcinfra.Redis(ctx,
 		tcinfra.RedisContainerName(redisContainerName),
@@ -61,6 +104,7 @@ package main
 import (
 	"context"
 	tcinfra "github.com/romnn/testcontainers/infra"
+	"github.com/romnn/testcontainers"
 	"log"
 )
 
@@ -69,7 +113,7 @@ func main() {
 	mongoContainerName := "mongo-01-test"
 	mongoContainerPort := 2189
 
-	tcinfra.DropContainerIfExists(mongoContainerName)
+	testcontainers.DropContainerIfExists(mongoContainerName)
 
 	db, terminate, err := tcinfra.Mongo(ctx,
 		tcinfra.MongoContainerName(mongoContainerName),
@@ -95,6 +139,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/romnn/testcontainers"
 	tcinfra "github.com/romnn/testcontainers/infra"
 )
 
@@ -104,7 +149,7 @@ func main() {
 	kafkaContainerName := "infra-01-kafka-container"
 	zookeeperContainerName := "infra-01-zookeeper-container"
 
-	tcinfra.DropContainers([]string{
+	testcontainers.DropContainers([]string{
 		kafkaContainerName,
 		zookeeperContainerName,
 	})
@@ -121,11 +166,11 @@ func main() {
 	// consuming, producing
 	_ = broker.Addr
 
-	kafkaExists, err := tcinfra.ContainerExists(kafkaContainerName)
+	kafkaExists, err := testcontainers.ContainerExists(kafkaContainerName)
 	if err != nil {
 		log.Fatal(err)
 	}
-	zooExists, err := tcinfra.ContainerExists(zookeeperContainerName)
+	zooExists, err := testcontainers.ContainerExists(zookeeperContainerName)
 	if err != nil {
 		log.Fatal(err)
 	}

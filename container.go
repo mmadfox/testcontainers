@@ -1,4 +1,4 @@
-package infra
+package testcontainers
 
 import (
 	"os/exec"
@@ -49,8 +49,12 @@ func DropContainerIfExists(containerName string) {
 	}
 }
 
+func DropNetwork(networkName string) {
+	_, _ = exec.Command(dockerCmd(), "network", "rm", networkName).Output()
+}
+
 func DropContainers(containerNames []string) {
-	_ = exec.Command(dockerCmd(), "network", "-f", "prune")
+	_, _ = exec.Command(dockerCmd(), "network", "-f", "prune").Output()
 	for i := 0; i < len(containerNames); i++ {
 		DropContainerIfExists(containerNames[i])
 	}

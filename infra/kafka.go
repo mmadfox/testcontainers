@@ -72,6 +72,12 @@ func Kafka(ctx context.Context, opts ...KafkaOption) (broker KafkaBroker, termin
 	}, nil
 }
 
+func KafkaEnableLogger() KafkaOption {
+	return func(opts *kafkaOptions) {
+		opts.logger = true
+	}
+}
+
 func KafkaContainerName(name string) KafkaOption {
 	return func(opts *kafkaOptions) {
 		opts.container.Name = name
@@ -93,5 +99,11 @@ func KafkaImageTag(tag string) KafkaOption {
 func ZookeeperImageTag(tag string) KafkaOption {
 	return func(opts *kafkaOptions) {
 		opts.container.ZookeeperImageTag = tag
+	}
+}
+
+func KafkaContainerNetwork(networks []string) KafkaOption {
+	return func(opts *kafkaOptions) {
+		opts.container.Networks = networks
 	}
 }

@@ -2,9 +2,11 @@ package infra
 
 import (
 	"context"
-	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
+
+	"github.com/romnn/testcontainers"
+	"github.com/stretchr/testify/require"
 )
 
 func TestRedis(t *testing.T) {
@@ -13,7 +15,7 @@ func TestRedis(t *testing.T) {
 	testVal := "test"
 	containerName := "infra-01-redis-container"
 
-	DropContainerIfExists(containerName)
+	testcontainers.DropContainerIfExists(containerName)
 
 	db, terminate, err := Redis(ctx,
 		RedisContainerPort(redisPort),

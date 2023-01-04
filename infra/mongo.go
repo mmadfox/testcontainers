@@ -72,6 +72,12 @@ func Mongo(ctx context.Context, opts ...MongoOption) (db *mongo.Database, termin
 	}, nil
 }
 
+func MongoEnableLogger() MongoOption {
+	return func(opts *mongoOptions) {
+		opts.logger = true
+	}
+}
+
 func MongoContainerNetwork(networks []string) MongoOption {
 	return func(opts *mongoOptions) {
 		opts.container.Networks = networks

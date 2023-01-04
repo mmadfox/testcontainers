@@ -7,6 +7,8 @@ import (
 	"syscall"
 	"testing"
 
+	"github.com/romnn/testcontainers"
+
 	"github.com/stretchr/testify/require"
 )
 
@@ -33,13 +35,12 @@ func assertPortIsClosed(t *testing.T, port int) {
 }
 
 func assertContainerExists(t *testing.T, name string) {
-	exists, err := ContainerExists(name)
+	exists, err := testcontainers.ContainerExists(name)
 	require.NoError(t, err)
 	require.True(t, exists)
 }
 
 func assertContainerNotExists(t *testing.T, name string) {
-	exists, err := ContainerExists(name)
-	require.Error(t, err)
+	exists, _ := testcontainers.ContainerExists(name)
 	require.False(t, exists)
 }

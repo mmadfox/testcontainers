@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/romnn/testcontainers"
+
 	"github.com/stretchr/testify/require"
 )
 
@@ -12,7 +14,7 @@ func TestKafka(t *testing.T) {
 	kafkaContainerName := "infra-01-kafka-container"
 	zookeeperContainerName := "infra-01-zookeeper-container"
 
-	DropContainers([]string{
+	testcontainers.DropContainers([]string{
 		kafkaContainerName,
 		zookeeperContainerName,
 	})
@@ -26,21 +28,21 @@ func TestKafka(t *testing.T) {
 	require.NotEmpty(t, broker.Addr)
 	require.NotEmpty(t, broker.Version)
 
-	kafkaContainerExists, err := ContainerExists(kafkaContainerName)
+	kafkaContainerExists, err := testcontainers.ContainerExists(kafkaContainerName)
 	require.NoError(t, err)
 	require.True(t, kafkaContainerExists)
 
-	zooContainerExists, err := ContainerExists(zookeeperContainerName)
+	zooContainerExists, err := testcontainers.ContainerExists(zookeeperContainerName)
 	require.NoError(t, err)
 	require.True(t, zooContainerExists)
 
 	terminate()
 
-	kafkaContainerExists, err = ContainerExists(kafkaContainerName)
+	kafkaContainerExists, err = testcontainers.ContainerExists(kafkaContainerName)
 	require.NoError(t, err)
 	require.False(t, kafkaContainerExists)
 
-	zooContainerExists, err = ContainerExists(zookeeperContainerName)
+	zooContainerExists, err = testcontainers.ContainerExists(zookeeperContainerName)
 	require.NoError(t, err)
 	require.False(t, zooContainerExists)
 }

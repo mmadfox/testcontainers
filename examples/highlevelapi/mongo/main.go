@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
-	tcinfra "github.com/romnn/testcontainers/infra"
 	"log"
+
+	"github.com/romnn/testcontainers"
+	tcinfra "github.com/romnn/testcontainers/infra"
 )
 
 func main() {
@@ -11,7 +13,7 @@ func main() {
 	mongoContainerName := "mongo-01-test"
 	mongoContainerPort := 2189
 
-	tcinfra.DropContainerIfExists(mongoContainerName)
+	testcontainers.DropContainerIfExists(mongoContainerName)
 
 	db, terminate, err := tcinfra.Mongo(ctx,
 		tcinfra.MongoContainerName(mongoContainerName),

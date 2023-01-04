@@ -3,8 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	tcinfra "github.com/romnn/testcontainers/infra"
 	"log"
+
+	"github.com/romnn/testcontainers"
+	tcinfra "github.com/romnn/testcontainers/infra"
 )
 
 func main() {
@@ -12,7 +14,7 @@ func main() {
 	redisContainerName := "redis-01-test"
 	redisContainerPort := 6718
 
-	tcinfra.DropContainerIfExists(redisContainerName)
+	testcontainers.DropContainerIfExists(redisContainerName)
 
 	db, terminate, err := tcinfra.Redis(ctx,
 		tcinfra.RedisContainerName(redisContainerName),

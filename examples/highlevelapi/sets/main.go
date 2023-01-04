@@ -4,103 +4,35 @@ import (
 	"context"
 	"log"
 
-	"github.com/romnn/testcontainers/infra"
+	"github.com/romnn/testcontainers"
 
-	"github.com/go-redis/redis"
-	"go.mongodb.org/mongo-driver/mongo"
+	"github.com/romnn/testcontainers/infra"
 )
 
 func main() {
-	myInfra := new(infrastructure)
-	defer myInfra.close()
+	myInfra := infra.NewSets()
+	defer myInfra.Close()
+
+	// reset containers if needed
+	testcontainers.DropNetwork(myInfra.ContainerNames.Network)
+	testcontainers.DropContainerIfExists(myInfra.ContainerNames.Redis)
+	testcontainers.DropContainerIfExists(myInfra.ContainerNames.Mongo)
+	testcontainers.DropContainerIfExists(myInfra.ContainerNames.Kafka)
+	testcontainers.DropContainerIfExists(myInfra.ContainerNames.Zookeeper)
 
 	ctx := context.Background()
-	myInfra.setupRedis(ctx)
-	myInfra.setupMongo(ctx)
-	myInfra.setupKafka(ctx)
+	myInfra.SetupBridgeNetwork(ctx)
+	myInfra.SetupRedis(ctx)
+	myInfra.SetupMongo(ctx)
+	myInfra.SetupKafka(ctx)
 
-	if myInfra.err != nil {
-		log.Fatal(myInfra.err)
+	if myInfra.Err() != nil {
+		log.Fatal(myInfra.Err())
 	}
 
 	// your testing logic ...
-}
 
-type infrastructure struct {
-	redis          *redis.Client
-	mongo          *mongo.Database
-	kafkaAddr      []string
-	terminates     []func()
-	containerNames []string
-	err            error
-}
-
-func (i *infrastructure) close() {
-	for x := 0; x < len(i.terminates); x++ {
-		i.terminates[x]()
-	}
-	infra.DropContainers(i.containerNames)
-}
-
-func (i *infrastructure) register(terminate func(), containerName ...string) {
-	i.terminates = append(i.terminates, terminate)
-	i.containerNames = append(i.containerNames, containerName...)
-}
-
-func (i *infrastructure) setupRedis(ctx context.Context) {
-	if i.err != nil {
-		return
-	}
-
-	containerName := "test-redis"
-	conn, terminate, err := infra.Redis(ctx,
-		infra.RedisContainerName(containerName),
-		infra.RedisContainerPort(3890),
-	)
-	if err != nil {
-		i.err = err
-		return
-	}
-
-	i.redis = conn
-	i.register(terminate, containerName)
-}
-
-func (i *infrastructure) setupMongo(ctx context.Context) {
-	if i.err != nil {
-		return
-	}
-
-	containerName := "test-mongo"
-	db, terminate, err := infra.Mongo(ctx,
-		infra.MongoContainerName(containerName),
-		infra.MongoContainerPort(2189),
-	)
-	if err != nil {
-		i.err = err
-		return
-	}
-
-	i.mongo = db
-	i.register(terminate, containerName)
-}
-
-func (i *infrastructure) setupKafka(ctx context.Context) {
-	if i.err != nil {
-		return
-	}
-
-	kafkaContainerName := "test-kafka"
-	zookeeperContainerName := "test-zoo"
-	broker, terminate, err := infra.Kafka(ctx,
-		infra.KafkaContainerName(kafkaContainerName),
-		infra.ZookeeperContainerName(zookeeperContainerName),
-	)
-	if err != nil {
-		i.err = err
-		return
-	}
-
-	i.kafkaAddr = broker.Addr
-	i.register(terminate, kafkaContainerName, zookeeperContainerName)
+	// myInfra.RedisClient() => storage, repository, etc
+	// myInfra.MongoDB()     => storage, repository, etc
+	// myInfra.KafkaAddr()   => producing, consuming, etc
 }

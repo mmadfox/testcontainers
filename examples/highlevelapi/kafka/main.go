@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/romnn/testcontainers"
+
 	tcinfra "github.com/romnn/testcontainers/infra"
 )
 
@@ -14,7 +16,7 @@ func main() {
 	kafkaContainerName := "infra-01-kafka-container"
 	zookeeperContainerName := "infra-01-zookeeper-container"
 
-	tcinfra.DropContainers([]string{
+	testcontainers.DropContainers([]string{
 		kafkaContainerName,
 		zookeeperContainerName,
 	})
@@ -31,11 +33,11 @@ func main() {
 	// consuming, producing
 	_ = broker.Addr
 
-	kafkaExists, err := tcinfra.ContainerExists(kafkaContainerName)
+	kafkaExists, err := testcontainers.ContainerExists(kafkaContainerName)
 	if err != nil {
 		log.Fatal(err)
 	}
-	zooExists, err := tcinfra.ContainerExists(zookeeperContainerName)
+	zooExists, err := testcontainers.ContainerExists(zookeeperContainerName)
 	if err != nil {
 		log.Fatal(err)
 	}

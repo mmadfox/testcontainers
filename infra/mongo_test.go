@@ -2,9 +2,11 @@ package infra
 
 import (
 	"context"
+	"testing"
+
+	"github.com/romnn/testcontainers"
 	"github.com/stretchr/testify/require"
 	"go.mongodb.org/mongo-driver/bson"
-	"testing"
 )
 
 func TestMongo(t *testing.T) {
@@ -13,7 +15,7 @@ func TestMongo(t *testing.T) {
 	testVal := "test"
 	containerName := "infra-01-mongo-container"
 
-	DropContainerIfExists(containerName)
+	testcontainers.DropContainerIfExists(containerName)
 
 	db, terminate, err := Mongo(ctx,
 		MongoContainerPort(mongoPort),
