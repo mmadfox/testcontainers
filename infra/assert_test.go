@@ -7,7 +7,7 @@ import (
 	"syscall"
 	"testing"
 
-	"github.com/romnn/testcontainers"
+	"github.com/mmadfox/testcontainers"
 
 	"github.com/stretchr/testify/require"
 )

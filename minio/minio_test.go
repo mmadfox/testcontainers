@@ -8,7 +8,7 @@ import (
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
-	tc "github.com/romnn/testcontainers"
+	tc "github.com/mmadfox/testcontainers"
 )
 
 // TestMinio ...

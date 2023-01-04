@@ -7,9 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/docker/go-connections/nat"
-	tc "github.com/romnn/testcontainers"
 	"github.com/testcontainers/testcontainers-go"
+
+	"github.com/docker/go-connections/nat"
+	tc "github.com/mmadfox/testcontainers"
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 

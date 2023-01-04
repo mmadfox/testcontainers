@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	tc "github.com/romnn/testcontainers"
+	tc "github.com/mmadfox/testcontainers"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

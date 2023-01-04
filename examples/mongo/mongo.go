@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	tcmongo "github.com/romnn/testcontainers/mongo"
+	tcmongo "github.com/mmadfox/testcontainers/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

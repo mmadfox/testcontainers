@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
-	tc "github.com/romnn/testcontainers"
-	tckafka "github.com/romnn/testcontainers/kafka"
+	tc "github.com/mmadfox/testcontainers"
+	tckafka "github.com/mmadfox/testcontainers/kafka"
 )
 
 func main() {

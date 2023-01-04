@@ -5,8 +5,8 @@ import (
 	"log"
 	"time"
 
-	tc "github.com/romnn/testcontainers"
-	tcredis "github.com/romnn/testcontainers/redis"
+	tc "github.com/mmadfox/testcontainers"
+	tcredis "github.com/mmadfox/testcontainers/redis"
 )
 
 func main() {

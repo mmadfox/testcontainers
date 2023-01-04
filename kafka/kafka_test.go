@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
+	tc "github.com/mmadfox/testcontainers"
 	"github.com/romnn/deepequal"
-	tc "github.com/romnn/testcontainers"
 )
 
 // TestKafka...
@@ -16,10 +16,7 @@ func TestKafka(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	container, err := Start(ctx, Options{
-		KafkaImageTag:     "5.4.10",
-		ZookeeperImageTag: "3.8.0",
-	})
+	container, err := Start(ctx, Options{})
 	if err != nil {
 		t.Fatalf("failed to start kafka container: %v", err)
 	}

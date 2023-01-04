@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 
-	"github.com/romnn/testcontainers"
+	"github.com/mmadfox/testcontainers"
 
-	"github.com/romnn/testcontainers/infra"
+	"github.com/mmadfox/testcontainers/infra"
 )
 
 func main() {

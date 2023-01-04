@@ -3,7 +3,7 @@ package infra
 import (
 	"context"
 
-	tc "github.com/romnn/testcontainers"
+	tc "github.com/mmadfox/testcontainers"
 
 	"github.com/go-redis/redis"
 	"github.com/testcontainers/testcontainers-go"

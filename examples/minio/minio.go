@@ -6,8 +6,8 @@ import (
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
-	tc "github.com/romnn/testcontainers"
-	tcminio "github.com/romnn/testcontainers/minio"
+	tc "github.com/mmadfox/testcontainers"
+	tcminio "github.com/mmadfox/testcontainers/minio"
 )
 
 func main() {

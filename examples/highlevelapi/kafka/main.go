@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/romnn/testcontainers"
+	"github.com/mmadfox/testcontainers"
 
-	tcinfra "github.com/romnn/testcontainers/infra"
+	tcinfra "github.com/mmadfox/testcontainers/infra"
 )
 
 func main() {

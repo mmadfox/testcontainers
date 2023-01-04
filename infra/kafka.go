@@ -3,9 +3,9 @@ package infra
 import (
 	"context"
 
-	tc "github.com/romnn/testcontainers"
+	tc "github.com/mmadfox/testcontainers"
 
-	tckafka "github.com/romnn/testcontainers/kafka"
+	tckafka "github.com/mmadfox/testcontainers/kafka"
 )
 
 type KafkaOption func(options *kafkaOptions)

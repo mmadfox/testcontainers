@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
+	tc "github.com/mmadfox/testcontainers"
 	"github.com/romnn/deepequal"
-	tc "github.com/romnn/testcontainers"
 	"github.com/streadway/amqp"
 )
 

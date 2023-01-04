@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/go-redis/redis"
-	tc "github.com/romnn/testcontainers"
+	tc "github.com/mmadfox/testcontainers"
 )
 
 // TestRedis ...
@@ -15,6 +15,7 @@ func TestRedis(t *testing.T) {
 	ctx := context.Background()
 	container, err := Start(ctx, Options{
 		ImageTag: "7.0.5",
+		Port:     6389,
 	})
 	if err != nil {
 		t.Fatalf("failed to start redis container: %v", err)

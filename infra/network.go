@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	tc "github.com/romnn/testcontainers"
+	tc "github.com/mmadfox/testcontainers"
 
 	"github.com/testcontainers/testcontainers-go"
 )
