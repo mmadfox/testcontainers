@@ -2,11 +2,11 @@ package infra
 
 import (
 	"context"
+	"time"
+
 	"github.com/go-redis/redis"
 	"github.com/romnn/testcontainers"
 	tcredis "github.com/romnn/testcontainers/redis"
-	tcgo "github.com/testcontainers/testcontainers-go"
-	"time"
 )
 
 type RedisOption func(*redisOptions)
@@ -19,13 +19,7 @@ type redisOptions struct {
 
 func Redis(ctx context.Context, opts ...RedisOption) (cli *redis.Client, terminate func(), err error) {
 	tcOpts := &redisOptions{
-		container: &tcredis.Options{
-			ContainerOptions: testcontainers.ContainerOptions{
-				ContainerRequest: tcgo.ContainerRequest{
-					AutoRemove: true,
-				},
-			},
-		},
+		container: &tcredis.Options{},
 		server: &redis.Options{
 			DB: 1,
 		},
@@ -33,11 +27,17 @@ func Redis(ctx context.Context, opts ...RedisOption) (cli *redis.Client, termina
 	for _, fn := range opts {
 		fn(tcOpts)
 	}
+	tcOpts.container.AutoRemove = true
 
 	container, err := tcredis.Start(ctx, *tcOpts.container)
 	if err != nil {
 		return nil, nil, err
 	}
+	defer func() {
+		if err != nil {
+			container.Terminate(ctx)
+		}
+	}()
 
 	var logger testcontainers.LogCollector
 

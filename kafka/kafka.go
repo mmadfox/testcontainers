@@ -21,6 +21,7 @@ type Options struct {
 	LogLevel          string
 	KafkaImageTag     string
 	ZookeeperImageTag string
+	ZookeeperName     string
 }
 
 // Container ...
@@ -194,6 +195,8 @@ func Start(ctx context.Context, options Options) (Composed, error) {
 			ContainerRequest: testcontainers.ContainerRequest{
 				Networks:       req.Networks,
 				NetworkAliases: aliases,
+				AutoRemove:     options.AutoRemove,
+				Name:           options.ZookeeperName,
 			},
 		},
 		ImageTag: options.ZookeeperImageTag,

@@ -2,12 +2,13 @@ package infra
 
 import (
 	"context"
+	"time"
+
 	tc "github.com/romnn/testcontainers"
 	tcmongo "github.com/romnn/testcontainers/mongo"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"time"
 )
 
 type MongoOption func(options *mongoOptions)
@@ -24,11 +25,17 @@ func Mongo(ctx context.Context, opts ...MongoOption) (db *mongo.Database, termin
 	for _, fn := range opts {
 		fn(tcOpts)
 	}
+	tcOpts.container.AutoRemove = true
 
 	container, err := tcmongo.Start(ctx, *tcOpts.container)
 	if err != nil {
 		return nil, nil, err
 	}
+	defer func() {
+		if err != nil {
+			container.Terminate(ctx)
+		}
+	}()
 
 	var logger tc.LogCollector
 
