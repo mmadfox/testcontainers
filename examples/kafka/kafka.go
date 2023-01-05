@@ -14,8 +14,8 @@ func main() {
 	ctx := context.Background()
 	container, err := tckafka.Start(ctx, tckafka.Options{
 		// you could use latest here
-		KafkaImageTag:     "5.4.10",
-		ZookeeperImageTag: "3.8.0",
+		// KafkaImageTag:     "5.4.10",
+		// ZookeeperImageTag: "3.8.0",
 	})
 	if err != nil {
 		log.Fatalf("failed to start container: %v", err)
