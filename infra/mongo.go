@@ -14,8 +14,9 @@ import (
 type MongoOption func(options *mongoOptions)
 
 type mongoOptions struct {
-	container *tcmongo.Options
-	logger    bool
+	container  *tcmongo.Options
+	logger     bool
+	replicaSet bool
 }
 
 func Mongo(ctx context.Context, opts ...MongoOption) (db *mongo.Database, terminate func(), err error) {
@@ -27,7 +28,49 @@ func Mongo(ctx context.Context, opts ...MongoOption) (db *mongo.Database, termin
 	}
 	tcOpts.container.AutoRemove = true
 
-	container, err := tcmongo.Start(ctx, *tcOpts.container)
+	if tcOpts.replicaSet {
+		return replicaSetMongo(ctx, tcOpts)
+	} else {
+		return standaloneMongo(ctx, tcOpts)
+	}
+}
+
+func replicaSetMongo(ctx context.Context, opts *mongoOptions) (db *mongo.Database, terminate func(), err error) {
+	container, err := tcmongo.StartReplicaSet(ctx, *opts.container)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer func() {
+		if err != nil {
+			container.Terminate(ctx)
+			tc.DropContainers(container.ContainerNames)
+		}
+	}()
+
+	mongoURI := container.MasterConnectionURI()
+	client, err := mongo.NewClient(options.Client().ApplyURI(mongoURI))
+	if err != nil {
+		return nil, nil, err
+	}
+	if err = client.Connect(ctx); err != nil {
+		return nil, nil, err
+	}
+
+	err = client.Ping(ctx, readpref.Primary())
+	if err != nil {
+		return nil, nil, err
+	}
+	database := client.Database("testdatabase")
+
+	return database, func() {
+		_ = client.Disconnect(ctx)
+		container.Terminate(ctx)
+		tc.DropContainers(container.ContainerNames)
+	}, nil
+}
+
+func standaloneMongo(ctx context.Context, opts *mongoOptions) (db *mongo.Database, terminate func(), err error) {
+	container, err := tcmongo.Start(ctx, *opts.container)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -39,7 +82,7 @@ func Mongo(ctx context.Context, opts ...MongoOption) (db *mongo.Database, termin
 
 	var logger tc.LogCollector
 
-	if tcOpts.logger {
+	if opts.logger {
 		logger, err = tc.StartLogger(ctx, container.Container)
 		if err != nil {
 			return nil, nil, err
@@ -70,6 +113,12 @@ func Mongo(ctx context.Context, opts ...MongoOption) (db *mongo.Database, termin
 		}
 		container.Terminate(ctx)
 	}, nil
+}
+
+func MongoEnableReplicaSet() MongoOption {
+	return func(opts *mongoOptions) {
+		opts.replicaSet = true
+	}
 }
 
 func MongoEnableLogger() MongoOption {

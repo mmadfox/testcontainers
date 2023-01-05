@@ -4,6 +4,12 @@ import (
 	"context"
 	"testing"
 
+	"go.mongodb.org/mongo-driver/mongo"
+
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readconcern"
+	"go.mongodb.org/mongo-driver/mongo/writeconcern"
+
 	"github.com/mmadfox/testcontainers"
 	"github.com/stretchr/testify/require"
 	"go.mongodb.org/mongo-driver/bson"
@@ -46,6 +52,31 @@ func TestMongo(t *testing.T) {
 
 	assertPortIsClosed(t, mongoPort)
 	assertContainerNotExists(t, containerName)
+}
+
+func TestMongoWithTxn(t *testing.T) {
+	ctx := context.Background()
+	db, terminate, err := Mongo(ctx, MongoEnableReplicaSet())
+	require.NoError(t, err)
+	defer terminate()
+
+	wc := writeconcern.New(writeconcern.WMajority())
+	rc := readconcern.Snapshot()
+	txnOpts := options.Transaction().SetWriteConcern(wc).SetReadConcern(rc)
+
+	session, err := db.Client().StartSession()
+	require.NoError(t, err)
+	defer session.EndSession(ctx)
+
+	err = mongo.WithSession(ctx, session, func(sessionContext mongo.SessionContext) error {
+		require.NoError(t, session.StartTransaction(txnOpts))
+		res, err := db.Collection("test").InsertOne(sessionContext, bson.M{"key": "value"}, nil)
+		require.NoError(t, err)
+		require.NotEmpty(t, res.InsertedID)
+		require.NoError(t, session.CommitTransaction(sessionContext))
+		return nil
+	})
+	require.NoError(t, err)
 }
 
 func TestMongoMultiContainers(t *testing.T) {

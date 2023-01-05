@@ -3,23 +3,23 @@ package mongo
 import (
 	"context"
 	"fmt"
-	"strconv"
-	"strings"
 	"time"
 
-	"github.com/docker/go-connections/nat"
 	tc "github.com/mmadfox/testcontainers"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
+const DefaultStartupTimeout = 30 * time.Second
+
 // Options ...
 type Options struct {
 	tc.ContainerOptions
-	User     string
-	Port     int
-	Password string
-	ImageTag string
+	User           string
+	Port           int
+	Password       string
+	ImageTag       string
+	StartupTimeout time.Duration
 }
 
 // Container ...
@@ -35,7 +35,7 @@ type Container struct {
 // Terminate ...
 func (c *Container) Terminate(ctx context.Context) {
 	if c.Container != nil {
-		c.Container.Terminate(ctx)
+		_ = c.Container.Terminate(ctx)
 	}
 }
 
@@ -58,11 +58,11 @@ func Start(ctx context.Context, options Options) (Container, error) {
 	if options.Port <= 0 {
 		options.Port = 27017
 	}
-
-	port, err := nat.NewPort("", strconv.Itoa(options.Port))
-	if err != nil {
-		return container, fmt.Errorf("failed to build port: %v", err)
-	}
+	//
+	//port, err := nat.NewPort("", strconv.Itoa(options.Port))
+	//if err != nil {
+	//	return container, fmt.Errorf("failed to build port: %v", err)
+	//}
 
 	env := make(map[string]string)
 	if options.User != "" && options.Password != "" {
@@ -75,21 +75,20 @@ func Start(ctx context.Context, options Options) (Container, error) {
 		timeout = 5 * time.Minute // Default timeout
 	}
 
-	rawPort := strings.Trim(string(port), "/")
-
 	tag := "latest"
 	if options.ImageTag != "" {
 		tag = options.ImageTag
 	}
 
 	exposedPorts := []string{
-		fmt.Sprintf("%s:%s", rawPort, "27017"),
+		fmt.Sprintf("%d:%s", options.Port, "27017"),
 	}
 
 	req := testcontainers.ContainerRequest{
 		Image:        fmt.Sprintf("mongo:%s", tag),
 		Env:          env,
 		ExposedPorts: exposedPorts,
+		Cmd:          []string{},
 		WaitingFor:   wait.ForListeningPort("27017").WithStartupTimeout(timeout),
 	}
 

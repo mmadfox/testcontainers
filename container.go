@@ -53,6 +53,10 @@ func DropNetwork(networkName string) {
 	_, _ = exec.Command(dockerCmd(), "network", "rm", networkName).Output()
 }
 
+func PruneNetwork() {
+	_, _ = exec.Command(dockerCmd(), "network", "prune").Output()
+}
+
 func DropContainers(containerNames []string) {
 	_, _ = exec.Command(dockerCmd(), "network", "-f", "prune").Output()
 	for i := 0; i < len(containerNames); i++ {
