@@ -23,7 +23,8 @@ func main() {
 	ctx := context.Background()
 	myInfra.SetupBridgeNetwork(ctx)
 	myInfra.SetupRedis(ctx)
-	myInfra.SetupMongo(ctx)
+	// myInfra.SetupMongo(ctx)
+	myInfra.SetupMongoReplicaSet(ctx)
 	myInfra.SetupKafka(ctx)
 
 	if myInfra.Err() != nil {

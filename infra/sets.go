@@ -145,6 +145,28 @@ func (i *Sets) SetupMongo(ctx context.Context) {
 	i.register(terminate, i.ContainerNames.Mongo)
 }
 
+func (i *Sets) SetupMongoReplicaSet(ctx context.Context) {
+	if i.err != nil {
+		return
+	}
+
+	opts := []MongoOption{
+		MongoContainerName(i.ContainerNames.Mongo),
+		MongoEnableReplicaSet(),
+	}
+	if len(i.networkName) > 0 {
+		opts = append(opts, MongoContainerNetwork([]string{i.networkName}))
+	}
+	db, terminate, err := Mongo(ctx, opts...)
+	if err != nil {
+		i.err = err
+		return
+	}
+
+	i.mongo = db
+	i.register(terminate, i.ContainerNames.Mongo)
+}
+
 func (i *Sets) SetupKafka(ctx context.Context) {
 	if i.err != nil {
 		return
