@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
+	"time"
 
 	dockerclient "github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
@@ -255,6 +256,21 @@ func Start(ctx context.Context, options Options) (Composed, error) {
 	err = composed.addStartScript(ctx, startScriptPath, options)
 	if err != nil {
 		return composed, err
+	}
+
+	for i := 0; i < 60; i++ {
+		kafkaState, err := composed.Kafka.Container.State(ctx)
+		if err != nil {
+			return composed, err
+		}
+		zooState, err := composed.Zookeeper.Container.State(ctx)
+		if err != nil {
+			return composed, err
+		}
+		if kafkaState.Running && zooState.Running {
+			break
+		}
+		time.Sleep(500 * time.Millisecond)
 	}
 
 	return composed, nil

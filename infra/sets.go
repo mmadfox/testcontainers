@@ -41,15 +41,16 @@ type Sets struct {
 }
 
 func NewSets() *Sets {
-	return &Sets{
+	sets := &Sets{
 		ContainerNames: ContainerNames{
-			Mongo:     DefaultMongo,
-			Redis:     DefaultRedis,
-			Kafka:     DefaultKafka,
-			Zookeeper: DefaultZookeeper,
-			Network:   DefaultNetwork,
+			Mongo:     DefaultMongo + tc.UniqueID(),
+			Redis:     DefaultRedis + tc.UniqueID(),
+			Kafka:     DefaultKafka + tc.UniqueID(),
+			Zookeeper: DefaultZookeeper + tc.UniqueID(),
+			Network:   DefaultNetwork + tc.UniqueID(),
 		},
 	}
+	return sets
 }
 
 func (i *Sets) Err() error {
@@ -62,9 +63,6 @@ func (i *Sets) RedisClient() *redis.Client {
 
 func (i *Sets) MongoDB() *mongo.Database {
 	return i.mongo
-}
-
-func (i *Sets) Clear() {
 }
 
 func (i *Sets) Close() {
@@ -89,6 +87,8 @@ func (i *Sets) SetupBridgeNetwork(ctx context.Context) {
 	if i.err != nil {
 		return
 	}
+
+	tc.PruneNetwork()
 
 	i.networkName = i.ContainerNames.Network
 	i.network, i.err = BridgeNetwork(ctx, i.networkName)
