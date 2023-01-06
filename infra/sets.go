@@ -164,7 +164,11 @@ func (i *Sets) SetupMongoReplicaSet(ctx context.Context) {
 	}
 
 	i.mongo = db
-	i.register(terminate, i.ContainerNames.Mongo)
+	i.register(terminate,
+		i.ContainerNames.Mongo+"-m1",
+		i.ContainerNames.Mongo+"-rs2",
+		i.ContainerNames.Mongo+"-rs3",
+	)
 }
 
 func (i *Sets) SetupKafka(ctx context.Context) {
